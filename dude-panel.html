@@ -1,0 +1,128 @@
+<!--
+Copyright (c) 2015 DudeTeam. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<!--
+`dude-panel` is a Polymer element boilerplate for dude library.
+
+@group dude Elements
+@element dude-panel
+@demo demo/index.html
+-->
+<dom-module id="dude-panel">
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        :host {
+            margin: 10px;
+            border-radius: 5px;
+            background: var(--dude-secondary-background-color);
+            width: 300px;
+            animation: 0.3s ease-out slideIn;
+            @apply(--layout-vertical);
+        }
+        :host(:not([panel-close])) {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        :host([panel-close]) {
+            animation: 0.3s ease-out slideOut;
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        #panelHeader {
+            color: var(--dude-content-text-color);
+            font-weight: bold;
+            font-size: .8em;
+            padding: 10px 20px;
+            border-bottom: 2px solid var(--dude-primary-background-color);
+            @apply(--layout-horizontal);
+        }
+        #panelClose {
+            cursor: pointer;
+        }
+        #panelTitle {
+            text-transform: uppercase;
+            @apply(--layout-flex);
+        }
+        #panelContent {
+            position: relative;
+            @apply(--layout-horizontal);
+            @apply(--layout-flex);
+        }
+    </style>
+    <template>
+        <div id="panelHeader">
+            <div id="panelTitle">[[ panelTitle ]]</div>
+            <i id="panelClose" on-click="close" class="fa fa-long-arrow-right"></i>
+        </div>
+        <div id="panelContent"></div>
+    </template>
+    <script>
+        Polymer({
+
+            is: "dude-panel",
+
+            properties: {
+
+                panelTitle: {
+                    type: String
+                },
+
+                panelElement: {
+                    type: String
+                },
+
+                project: {
+                    type: Object
+                }
+
+            },
+
+            ready: function () {
+                this.hidden = true;
+                var panel = document.createElement(this.get("panelElement"));
+                panel.project = this.project;
+                this.$["panelContent"].appendChild(panel);
+            },
+
+            open: function () {
+                this.hidden = false;
+            },
+
+            close: function (finishCallback) {
+                if (this.hasAttribute("panel-close")) {
+                    return;
+                }
+                this.setAttribute("panel-close", "");
+                setTimeout(function () {
+                    this.hidden = true;
+                    this.removeAttribute("panel-close");
+                    this.fire("dude-panel-close");
+                    if (typeof finishCallback === "function") {
+                        finishCallback();
+                    }
+                }.bind(this), 300);
+            }
+
+        });
+    </script>
+</dom-module>
